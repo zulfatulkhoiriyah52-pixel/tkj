@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif Router & Networking</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: #2c3e50;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 10px;
+            border: none;
+            background: transparent;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .tab-btn.active {
+            background: #3498db;
+        }
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 25px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Bilingual Styling */
+        .en-text {
+            color: #000000; /* Hitam */
+            font-weight: bold;
+            display: block;
+        }
+        .id-text {
+            color: #0000FF; /* Biru */
+            font-size: 0.9em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Halaman 1: Panduan Umum */
+        .card-guide {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .card-g1 { background-color: #e8f4f8; border-left: 5px solid #3498db; }
+        .card-g2 { background-color: #eafaf1; border-left: 5px solid #2ecc71; }
+        .card-g3 { background-color: #fef9e7; border-left: 5px solid #f1c40f; }
+        .card-g4 { background-color: #fadbd8; border-left: 5px solid #e74c3c; }
+        .card-g6 { background-color: #f3e5f5; border-left: 5px solid #9c27b0; }
+
+        /* Halaman 2: Drag & Drop */
+        .drag-drop-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            border: 2px solid #ccc;
+        }
+        .image-wrapper img {
+            width: 100%;
+            display: block;
+        }
+        /* Point & Drop Zones */
+        .point {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .drop-zone {
+            position: absolute;
+            border: 2px dashed #3498db;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 4px;
+            z-index: 5;
+            transition: background 0.3s;
+        }
+        .drop-zone.correct {
+            background-color: #2ecc71 !important;
+            border-style: solid;
+            color: white;
+        }
+        .svg-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .drag-bank {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .drag-item {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border-radius: 4px;
+            cursor: grab;
+            font-weight: bold;
+        }
+
+        /* Halaman 3: Feature Functions */
+        .feature-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .function-desc {
+            margin: 8px 0;
+            padding: 8px;
+            background: #eef7fc;
+            border-radius: 4px;
+        }
+        .btn-action {
+            padding: 8px 15px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-native { background: #27ae60; }
+        .btn-practice { background: #e67e22; }
+        .feedback-bar-container {
+            margin-top: 15px;
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .bar-group { margin-bottom: 8px; }
+        .bar-outer {
+            width: 100%;
+            background: #ddd;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .bar-inner {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        /* Halaman 4: Quiz */
+        .quiz-sec { margin-bottom: 20px; }
+        .mcq-option { margin: 5px 0; display: block; }
+        
+        /* Buttons General */
+        .btn-ctrl {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-feedback { background: #8e44ad; }
+        .btn-submit { background: #2980b9; }
+        .btn-csv { background: #16a085; }
+
+        /* Halaman 6: Writing Exercise */
+        .writing-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .vocab-box {
+            flex: 1;
+            min-width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .vocab-chip {
+            display: inline-block;
+            background: #e1f5fe;
+            color: #0288d1;
+            padding: 5px 10px;
+            margin: 3px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .writing-box {
+            flex: 2;
+            min-width: 300px;
+        }
+        textarea.writing-textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: vertical;
+            font-size: 14px;
+        }
+        .writing-feedback {
+            margin-top: 20px;
+            padding: 20px;
+            background: #eef9f1;
+            border: 1px solid #2ecc71;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="openTab('tab1')">Panduan Umum (General Guide)</button>
+        <button class="tab-btn" onclick="openTab('tab2')">Aktivitas Drag & Drop (Drag & Drop Activity)</button>
+        <button class="tab-btn" onclick="openTab('tab3')">Fungsi Fitur & Latihan Speaking (Feature Functions & Speaking)</button>
+        <button class="tab-btn" onclick="openTab('tab4')">Reading Text & Kuis (Reading & Quiz Section)</button>
+        <button class="tab-btn" onclick="openTab('tab6')">Writing Exercise</button>
+    </div>
+
+    <!-- HALAMAN 1: Panduan Umum -->
+    <div id="tab1" class="tab-content active">
+        <div class="card-guide card-g1">
+            <span class="en-text">General Instructions: Tab 1</span>
+            <span class="id-text">Instruksi Umum: Halaman ini memuat panduan navigasi untuk seluruh aktivitas pembelajaran.</span>
+        </div>
+        <div class="card-guide card-g2">
+            <span class="en-text">Drag & Drop Activity Guide (Tab 2)</span>
+            <span class="id-text">Panduan Aktivitas Drag & Drop: Pada Halaman 2, tariklah kata tanpa ekstensi ke kotak drop-zone yang terhubung ke nomor 1-6 pada gambar router/stir mobil.</span>
+        </div>
+        <div class="card-guide card-g3">
+            <span class="en-text">Feature Functions & Speaking Practice Guide (Tab 3)</span>
+            <span class="id-text">Panduan Fungsi Fitur & Latihan Speaking: Pelajari 6 bagian alat beserta fungsinya. Gunakan tombol 'native' untuk TTS dan 'practice' untuk latihan speaking.</span>
+        </div>
+        <div class="card-guide card-g4">
+            <span class="en-text">Reading & Quiz Guide (Tab 4)</span>
+            <span class="id-text">Panduan Reading & Kuis: Bacalah teks dan jawab 6 soal kuis pilihan ganda. Gunakan 'feedback', 'Submit', dan 'Save CSV'.</span>
+        </div>
+        <div class="card-guide card-g6">
+            <span class="en-text">Writing Exercise Guide (Tab 6)</span>
+            <span class="id-text">Panduan Writing Exercise: Tuliskan teks deskriptif tentang router menggunakan kata bantu yang disediakan, lalu klik Submit untuk analisis nilai dan feedback.</span>
+        </div>
+    </div>
+
+    <!-- HALAMAN 2: Drag & Drop Activity -->
+    <div id="tab2" class="tab-content">
+        <span class="en-text">Drag the correct terms to the matching numbered drop zones on the image:</span>
+        <span class="id-text">Tariklah istilah yang tepat ke kotak drop zone yang terhubung dengan nomor 1-6 pada gambar:</span>
+        
+        <div class="drag-drop-container">
+            <div class="image-wrapper" id="imgWrapper">
+                <img src="stir mobil.png" id="targetImg" alt="Stir Mobil / Router" onerror="this.src='gambar/router.png'; this.onerror=function(){this.src='https://via.placeholder.com/800x400?text=Gambar+Stir+Mobil+/+Router';}">
+                
+                <svg class="svg-lines" id="svgCanvas"></svg>
+
+                <!-- Titik 1-6 -->
+                <div class="point" id="pt1" style="top: 20%; left: 15%;">1</div>
+                <div class="point" id="pt2" style="top: 20%; left: 80%;">2</div>
+                <div class="point" id="pt3" style="top: 50%; left: 25%;">3</div>
+                <div class="point" id="pt4" style="top: 50%; left: 70%;">4</div>
+                <div class="point" id="pt5" style="top: 80%; left: 20%;">5</div>
+                <div class="point" id="pt6" style="top: 80%; left: 75%;">6</div>
+
+                <!-- Drop Zones -->
+                <div class="drop-zone" id="dz1" style="top: 10%; left: 30%; width: 120px; height: 35px;" data-answer="Power" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="drop-zone" id="dz2" style="top: 10%; left: 55%; width: 120px; height: 35px;" data-answer="Internet" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="drop-zone" id="dz3" style="top: 40%; left: 5%; width: 120px; height: 35px;" data-answer="LAN" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="drop-zone" id="dz4" style="top: 40%; left: 82%; width: 120px; height: 35px;" data-answer="WLAN" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="drop-zone" id="dz5" style="top: 70%; left: 35%; width: 120px; height: 35px;" data-answer="WPS" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="drop-zone" id="dz6" style="top: 70%; left: 55%; width: 120px; height: 35px;" data-answer="Reset" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            </div>
+        </div>
+
+        <div class="drag-bank">
+            <div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag1">Power</div>
+            <div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag2">Internet</div>
+            <div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag3">LAN</div>
+            <div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag4">WLAN</div>
+            <div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag5">WPS</div>
+            <div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag6">Reset</div>
+        </div>
+    </div>
+
+    <!-- HALAMAN 3: Feature Functions & Speaking Practice (6 Alat & Fungsi) -->
+    <div id="tab3" class="tab-content">
+        <span class="en-text">Feature Functions & Speaking Practice</span>
+        <span class="id-text">Fungsi Fitur & Latihan Speaking</span>
+        
+        <div id="featureList">
+            <!-- 1. Power Light -->
+            <div class="feature-item" data-text="Power Indicator Light. Function: It shows whether the router is receiving electrical power and turned on.">
+                <span class="en-text">1. Power Indicator Light</span>
+                <span class="id-text">1. Lampu Indikator Daya</span>
+                <div class="function-desc">
+                    <span class="en-text">Function: It shows whether the device is receiving electrical power and turned on.</span>
+                    <span class="id-text">Fungsi: Menunjukkan apakah perangkat menerima daya listrik dan menyala.</span>
+                </div>
+                <button class="btn-action btn-native" onclick="playTTS('Power Indicator Light. It shows whether the device is receiving electrical power and turned on.')">native</button>
+                <button class="btn-action btn-practice" onclick="startSpeakingPractice(this)">practice</button>
+            </div>
+
+            <!-- 2. Internet Port -->
+            <div class="feature-item" data-text="Internet Port (WAN). Function: Connects the router to the modem or Internet provider cable to receive signal.">
+                <span class="en-text">2. Internet Port (WAN)</span>
+                <span class="id-text">2. Port Internet (WAN)</span>
+                <div class="function-desc">
+                    <span class="en-text">Function: Connects the router to the modem or ISP cable to receive global internet connection.</span>
+                    <span class="id-text">Fungsi: Menghubungkan router ke modem atau kabel ISP untuk menerima koneksi internet.</span>
+                </div>
+                <button class="btn-action btn-native" onclick="playTTS('Internet Port. Connects the router to the modem or ISP cable to receive global internet connection.')">native</button>
+                <button class="btn-action btn-practice" onclick="startSpeakingPractice(this)">practice</button>
+            </div>
+
+            <!-- 3. LAN Ports -->
+            <div class="feature-item" data-text="LAN Ports. Function: Provides wired network connections to computers, laptops, or smart TVs.">
+                <span class="en-text">3. LAN Ports (Local Area Network)</span>
+                <span class="id-text">3. Port LAN (Jaringan Area Lokal)</span>
+                <div class="function-desc">
+                    <span class="en-text">Function: Provides wired Ethernet network connections to computers, laptops, or smart devices.</span>
+                    <span class="id-text">Fungsi: Menyediakan koneksi jaringan kabel Ethernet ke komputer, laptop, atau perangkat pintar.</span>
+                </div>
+                <button class="btn-action btn-native" onclick="playTTS('LAN Ports. Provides wired Ethernet network connections to computers or laptops.')">native</button>
+                <button class="btn-action btn-practice" onclick="startSpeakingPractice(this)">practice</button>
+            </div>
+
+            <!-- 4. WLAN Antenna -->
+            <div class="feature-item" data-text="WLAN Antenna. Function: Transmits and receives wireless Wi-Fi signals to mobile devices.">
+                <span class="en-text">4. WLAN Antenna (Wireless Local Area Network)</span>
+                <span class="id-text">4. Antena WLAN</span>
+                <div class="function-desc">
+                    <span class="en-text">Function: Transmits and receives wireless Wi-Fi signals to connected mobile devices.</span>
+                    <span class="id-text">Fungsi: Memancarkan dan menerima sinyal Wi-Fi nirkabel ke perangkat seluler.</span>
+                </div>
+                <button class="btn-action btn-native" onclick="playTTS('WLAN Antenna. Transmits and receives wireless Wi-Fi signals to connected mobile devices.')">native</button>
+                <button class="btn-action btn-practice" onclick="startSpeakingPractice(this)">practice</button>
+            </div>
+
+            <!-- 5. WPS Button -->
+            <div class="feature-item" data-text="WPS Button. Function: Allows quick wireless connection between devices without entering a password.">
+                <span class="en-text">5. WPS Button (Wi-Fi Protected Setup)</span>
+                <span class="id-text">5. Tombol WPS</span>
+                <div class="function-desc">
+                    <span class="en-text">Function: Allows quick and secure wireless connection between devices without entering a password.</span>
+                    <span class="id-text">Fungsi: Memungkinkan koneksi nirkabel cepat tanpa perlu memasukkan kata sandi.</span>
+                </div>
+                <button class="btn-action btn-native" onclick="playTTS('WPS Button. Allows quick and secure wireless connection between devices without entering a password.')">native</button>
+                <button class="btn-action btn-practice" onclick="startSpeakingPractice(this)">practice</button>
+            </div>
+
+            <!-- 6. Reset Button -->
+            <div class="feature-item" data-text="Reset Button. Function: Restores the router configurations back to default factory settings.">
+                <span class="en-text">6. Reset Button</span>
+                <span class="id-text">6. Tombol Reset</span>
+                <div class="function-desc">
+                    <span class="en-text">Function: Restores the router configurations and passwords back to default factory settings.</span>
+                    <span class="id-text">Fungsi: Mengembalikan konfigurasi dan kata sandi router kembali ke pengaturan awal pabrik.</span>
+                </div>
+                <button class="btn-action btn-native" onclick="playTTS('Reset Button. Restores the router configurations back to default factory settings.')">native</button>
+                <button class="btn-action btn-practice" onclick="startSpeakingPractice(this)">practice</button>
+            </div>
+        </div>
+
+        <!-- Feedback Bar Speaking -->
+        <div class="feedback-bar-container" id="feedbackSpeaking">
+            <h3>Feedback Speaking Performance</h3>
+            <div class="bar-group">
+                <span>Fluency: <b id="scoreFluency">0%</b></span>
+                <div class="bar-outer"><div class="bar-inner" id="barFluency"></div></div>
+            </div>
+            <div class="bar-group">
+                <span>Coherence: <b id="scoreCoherence">0%</b></span>
+                <div class="bar-outer"><div class="bar-inner" id="barCoherence"></div></div>
+            </div>
+            <div class="bar-group">
+                <span>Pronunciation: <b id="scorePron">0%</b></span>
+                <div class="bar-outer"><div class="bar-inner" id="barPron"></div></div>
+            </div>
+            <div class="bar-group">
+                <span>Stress: <b id="scoreStress">0%</b></span>
+                <div class="bar-outer"><div class="bar-inner" id="barStress"></div></div>
+            </div>
+            <div class="bar-group">
+                <span>Intonasi: <b id="scoreIntonasi">0%</b></span>
+                <div class="bar-outer"><div class="bar-inner" id="barIntonasi"></div></div>
+            </div>
+            <p style="margin-top:15px;"><strong>Rekomendasi Kualitatif:</strong> <span id="qualitativeRec">-</span></p>
+        </div>
+    </div>
+
+    <!-- HALAMAN 4: Reading Text & Kuis (6 Soal) -->
+    <div id="tab4" class="tab-content">
+        <span class="en-text">Reading & Quiz Section</span>
+        <span class="id-text">Reading Text & Kuis</span>
+
+        <div style="background:#f9f9f9; padding:15px; border-radius:6px; margin-bottom:20px;">
+            <span class="en-text">A Wi-Fi router is a hardware device that routes data packets between computer networks. It plays a critical role in home and office networking. Modern routers feature multiple ports such as WAN for internet cable connection, LAN ports for local wired devices, and wireless antennas (WLAN) to broadcast Wi-Fi signals. Indicators like power lights notify users of operating status, while WPS buttons provide easy wireless pairing. If configuration errors happen, the reset button restores default factory settings.</span>
+            <span class="id-text">Router Wi-Fi adalah perangkat keras yang mengarahkan paket data antar jaringan komputer. Router memainkan peran penting dalam jaringan rumah dan kantor. Router modern memiliki beberapa port seperti WAN untuk koneksi kabel internet, port LAN untuk perangkat kabel lokal, dan antena nirkabel (WLAN) untuk memancarkan sinyal Wi-Fi. Indikator seperti lampu daya memberi tahu pengguna tentang status pengoperasian, sementara tombol WPS memberikan kemudahan penyambungan nirkabel. Jika terjadi kesalahan konfigurasi, tombol reset mengembalikan pengaturan awal pabrik.</span>
+        </div>
+
+        <!-- 6 Soal Kuis -->
+        <div class="quiz-sec">
+            <p><span class="en-text">1. What is the primary function of a Wi-Fi router?</span><span class="id-text">1. Apa fungsi utama dari router Wi-Fi?</span></p>
+            <label class="mcq-option"><input type="radio" name="q1" value="A"> A. To print documents wirelessly / Mencetak dokumen secara nirkabel</label>
+            <label class="mcq-option"><input type="radio" name="q1" value="B" id="q1_correct"> B. To route data packets between networks / Mengarahkan paket data antar jaringan</label>
+            <label class="mcq-option"><input type="radio" name="q1" value="C"> C. To store large video files / Menyimpan berkas video berukuran besar</label>
+        </div>
+
+        <div class="quiz-sec">
+            <p><span class="en-text">2. Which port connects the router to the ISP internet cable?</span><span class="id-text">2. Port mana yang menghubungkan router ke kabel internet ISP?</span></p>
+            <label class="mcq-option"><input type="radio" name="q2" value="A" id="q2_correct"> A. WAN / Internet Port</label>
+            <label class="mcq-option"><input type="radio" name="q2" value="B"> B. LAN Port</label>
+            <label class="mcq-option"><input type="radio" name="q2" value="C"> C. USB Port</label>
+        </div>
+
+        <div class="quiz-sec">
+            <p><span class="en-text">3. What is the main purpose of LAN ports on a router?</span><span class="id-text">3. Apa tujuan utama dari port LAN pada router?</span></p>
+            <label class="mcq-option"><input type="radio" name="q3" value="A"> A. To increase power voltage / Meningkatkan tegangan daya</label>
+            <label class="mcq-option"><input type="radio" name="q3" value="B" id="q3_correct"> B. To connect wired local devices like PCs / Menghubungkan perangkat lokal ber-kabel seperti PC</label>
+            <label class="mcq-option"><input type="radio" name="q3" value="C"> C. To pair wireless devices automatically / Memasangkan perangkat nirkabel secara otomatis</label>
+        </div>
+
+        <div class="quiz-sec">
+            <p><span class="en-text">4. What component is used to broadcast wireless Wi-Fi signals?</span><span class="id-text">4. Komponen mana yang digunakan untuk memancarkan sinyal Wi-Fi nirkabel?</span></p>
+            <label class="mcq-option"><input type="radio" name="q4" value="A"> A. Power Light / Lampu Daya</label>
+            <label class="mcq-option"><input type="radio" name="q4" value="B" id="q4_correct"> B. WLAN Antenna / Antena WLAN</label>
+            <label class="mcq-option"><input type="radio" name="q4" value="C"> C. Reset Button / Tombol Reset</label>
+        </div>
+
+        <div class="quiz-sec">
+            <p><span class="en-text">5. What does the WPS button facilitate?</span><span class="id-text">5. Apa yang dipermudah oleh tombol WPS?</span></p>
+            <label class="mcq-option"><input type="radio" name="q5" value="A" id="q5_correct"> A. Easy wireless pairing without entering passwords / Kemudahan pairing nirkabel tanpa memasukkan kata sandi</label>
+            <label class="mcq-option"><input type="radio" name="q5" value="B"> B. Turning off the power supply / Mematikan pasokan daya</label>
+            <label class="mcq-option"><input type="radio" name="q5" value="C"> C. Deleting network files / Menghapus berkas jaringan</label>
+        </div>
+
+        <div class="quiz-sec">
+            <p><span class="en-text">6. How can a user restore factory default settings on a router?</span><span class="id-text">6. Bagaimana cara pengguna mengembalikan pengaturan awal pabrik pada router?</span></p>
+            <label class="mcq-option"><input type="radio" name="q6" value="A"> A. Unplugging the LAN cable / Mencabut kabel LAN</label>
+            <label class="mcq-option"><input type="radio" name="q6" value="B"> B. Pressing the WPS button / Menekan tombol WPS</label>
+            <label class="mcq-option"><input type="radio" name="q6" value="C" id="q6_correct"> C. Pressing the Reset button / Menekan tombol Reset</label>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button class="btn-ctrl btn-feedback" onclick="checkMCQFeedback()">feedback</button>
+            <button class="btn-ctrl btn-submit" onclick="submitMCQ()">Submit</button>
+            <button class="btn-ctrl btn-csv" onclick="exportCSV()">Save CSV</button>
+        </div>
+        <div id="quizResult" style="margin-top: 15px; font-weight: bold;"></div>
+    </div>
+
+    <!-- HALAMAN 6: Writing Exercise -->
+    <div id="tab6" class="tab-content">
+        <span class="en-text">Writing Exercise: Descriptive Text</span>
+        <span class="id-text">Latihan Menulis: Teks Deskriptif</span>
+        <p><span class="en-text">Write a short descriptive text (50-100 words) describing the router shown in the image and its parts. Use the vocabulary helpers below to construct your sentences.</span>
+        <span class="id-text">Tuliskan teks deskriptif pendek (50-100 kata) yang mendeskripsikan router pada gambar beserta bagian-bagiannya. Gunakan bantuan kosakata di bawah ini untuk menyusun kalimat Anda.</span></p>
+
+        <div class="writing-container">
+            <!-- Vocabulary Helpers & Gambar -->
+            <div class="vocab-box">
+                <h4>Vocabulary Helpers</h4>
+                <div style="text-align:center; margin-bottom:10px;">
+                    <img src="stir mobil.png" alt="Router" style="max-width:100%; height:auto; border-radius:4px; border:1px solid #ccc;" onerror="this.src='gambar/router.png'; this.onerror=function(){this.src='https://via.placeholder.com/250x150?text=Router+Image';}">
+                </div>
+                <span class="vocab-chip">router</span>
+                <span class="vocab-chip">device</span>
+                <span class="vocab-chip">antenna</span>
+                <span class="vocab-chip">LAN port</span>
+                <span class="vocab-chip">Internet</span>
+                <span class="vocab-chip">connects</span>
+                <span class="vocab-chip">wireless</span>
+                <span class="vocab-chip">signal</span>
+                <span class="vocab-chip">indicator light</span>
+                <span class="vocab-chip">power</span>
+                <span class="vocab-chip">reset button</span>
+                <span class="vocab-chip">network</span>
+            </div>
+
+            <!-- Area Penulisan -->
+            <div class="writing-box">
+                <textarea id="writingInput" class="writing-textarea" placeholder="Write your descriptive text here in English... (e.g., This is a networking router. It has an antenna to transmit wireless signals...)"></textarea>
+                <br><br>
+                <button class="btn-ctrl btn-submit" onclick="submitWriting()">Submit Writing</button>
+            </div>
+        </div>
+
+        <!-- Output Feedback Writing -->
+        <div id="writingFeedback" class="writing-feedback">
+            <h3>Hasil Evaluasi & Feedback Writing</h3>
+            <p><strong>Skor Total Writing: <span id="writingScore" style="font-size:1.3em; color:#27ae60;">0</span> / 100</strong></p>
+            <hr>
+            <p><strong>Kelebihan (Strengths):</strong> <br><span id="feedbackStrengths">-</span></p>
+            <p><strong>Area Perbaikan (Areas for Improvement):</strong> <br><span id="feedbackWeaknesses">-</span></p>
+            <p><strong>Saran Kualitatif (Suggestions):</strong> <br><span id="feedbackSuggestions">-</span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab Handler
+    function openTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(tabId === 'tab2') drawLines();
+    }
+
+    // TTS Functionality (Khusus Bahasa Inggris)
+    function playTTS(text) {
+        if ('speechSynthesis' in window) {
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            speechSynthesis.speak(utterance);
+        } else {
+            alert("TTS tidak didukung pada browser ini.");
+        }
+    }
+
+    // Drawing Lines (Tab 2)
+    function drawLines() {
+        const svg = document.getElementById('svgCanvas');
+        if (!svg) return;
+        svg.innerHTML = '';
+        for (let i = 1; i <= 6; i++) {
+            const pt = document.getElementById(`pt${i}`);
+            const dz = document.getElementById(`dz${i}`);
+            
+            if(!pt || !dz) continue;
+            const ptRect = pt.getBoundingClientRect();
+            const dzRect = dz.getBoundingClientRect();
+            const parentRect = document.getElementById('imgWrapper').getBoundingClientRect();
+
+            const x1 = ptRect.left + ptRect.width/2 - parentRect.left;
+            const y1 = ptRect.top + ptRect.height/2 - parentRect.top;
+            const x2 = dzRect.left + dzRect.width/2 - parentRect.left;
+            const y2 = dzRect.top + dzRect.height/2 - parentRect.top;
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#3498db');
+            line.setAttribute('stroke-width', '2');
+            svg.appendChild(line);
+        }
+    }
+    window.addEventListener('resize', drawLines);
+
+    // Drag and Drop Logic
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.innerText);
+        ev.dataTransfer.setData("elementId", ev.target.id);
+    }
+    function drop(ev) {
+        ev.preventDefault();
+        let data = ev.dataTransfer.getData("text");
+        let elementId = ev.dataTransfer.getData("elementId");
+        let dropTarget = ev.target;
+
+        if (!dropTarget.classList.contains('drop-zone')) {
+            dropTarget = dropTarget.closest('.drop-zone');
+        }
+
+        let correctAnswer = dropTarget.getAttribute('data-answer');
+
+        if (data === correctAnswer) {
+            dropTarget.innerText = data;
+            dropTarget.classList.add('correct');
+            document.getElementById(elementId).style.visibility = 'hidden';
+            playTTS("you are right. " + data);
+        } else {
+            playTTS("you are wrong, try again");
+        }
+    }
+
+    // Speaking Practice Simulation (Tab 3)
+    function startSpeakingPractice(btn) {
+        const item = btn.closest('.feature-item');
+        const text = item.getAttribute('data-text');
+
+        alert(`Merekam suara Anda untuk latihan membaca: "${text}"... (Simulasi Pengujian Speaking)`);
+        
+        setTimeout(() => {
+            const fluency = Math.floor(Math.random() * 20) + 80;
+            const coherence = Math.floor(Math.random() * 20) + 75;
+            const pron = Math.floor(Math.random() * 25) + 75;
+            const stress = Math.floor(Math.random() * 20) + 80;
+            const intonasi = Math.floor(Math.random() * 20) + 78;
+
+            document.getElementById('feedbackSpeaking').style.display = 'block';
+            
+            document.getElementById('scoreFluency').innerText = fluency + '%';
+            document.getElementById('barFluency').style.width = fluency + '%';
+
+            document.getElementById('scoreCoherence').innerText = coherence + '%';
+            document.getElementById('barCoherence').style.width = coherence + '%';
+
+            document.getElementById('scorePron').innerText = pron + '%';
+            document.getElementById('barPron').style.width = pron + '%';
+
+            document.getElementById('scoreStress').innerText = stress + '%';
+            document.getElementById('barStress').style.width = stress + '%';
+
+            document.getElementById('scoreIntonasi').innerText = intonasi + '%';
+            document.getElementById('barIntonasi').style.width = intonasi + '%';
+
+            let rec = "Bagus! Pengucapan Anda cukup jelas. Tingkatkan intonasi dan penekanan (stress) pada kata kunci untuk hasil lebih maksimal.";
+            if (pron < 80) rec = "Fokus pada pengucapan vokal dan konsonan Bahasa Inggris dengan lebih jelas.";
+            document.getElementById('qualitativeRec').innerText = rec;
+
+            document.getElementById('feedbackSpeaking').scrollIntoView({ behavior: 'smooth' });
+        }, 800);
+    }
+
+    // Quiz MCQ Logic (6 Soal)
+    let quizSubmitted = false;
+    let scoreTotal = 0;
+
+    function checkMCQFeedback() {
+        let answeredAll = true;
+        let allCorrect = true;
+
+        for (let i = 1; i <= 6; i++) {
+            let q = document.querySelector(`input[name="q${i}"]:checked`);
+            if(!q) answeredAll = false;
+            let correctEl = document.getElementById(`q${i}_correct`);
+            if(!correctEl || !correctEl.checked) allCorrect = false;
+        }
+
+        if(!answeredAll) {
+            alert("Harap jawab seluruh 6 soal kuis terlebih dahulu!");
+            return;
+        }
+
+        if (allCorrect) {
+            playTTS("you are right");
+            alert("Feedback: Semua jawaban Anda BENAR!");
+        } else {
+            playTTS("you are wrong, try again");
+            alert("Feedback: Beberapa jawaban masih SALAH. Periksa kembali!");
+        }
+    }
+
+    function submitMCQ() {
+        let countCorrect = 0;
+        let answeredCount = 0;
+
+        for (let i = 1; i <= 6; i++) {
+            let q = document.querySelector(`input[name="q${i}"]:checked`);
+            if(q) answeredCount++;
+            let correctEl = document.getElementById(`q${i}_correct`);
+            if(correctEl && correctEl.checked) countCorrect++;
+        }
+
+        if(answeredCount < 6) {
+            alert("Harap pilih jawaban untuk semua 6 soal sebelum Submit!");
+            return;
+        }
+
+        scoreTotal = Math.round((countCorrect / 6) * 100);
+        quizSubmitted = true;
+        document.getElementById('quizResult').innerText = `Jawaban berhasil disimpan. Nilai Total Kuis Anda: ${scoreTotal}/100 (${countCorrect} dari 6 benar)`;
+    }
+
+    function exportCSV() {
+        if(!quizSubmitted) {
+            alert("Silakan tekan tombol 'Submit' terlebih dahulu sebelum mengunduh CSV!");
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,Halaman,Aktivitas,Skor Total\n";
+        csvContent += `Halaman 4,Kuis Reading 6 Nomor,${scoreTotal}\n`;
+
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "hasil_siswa_pembelajaran.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Writing Exercise Analysis & Evaluator (Tab 6)
+    function submitWriting() {
+        const text = document.getElementById('writingInput').value.trim();
+        if(!text) {
+            alert("Harap tuliskan teks deskriptif sebelum menekan Submit!");
+            return;
+        }
+
+        const words = text.split(/\s+/).filter(w => w.length > 0);
+        const wordCount = words.length;
+
+        // Vocabulary Check
+        const targetKeywords = ["router", "device", "antenna", "lan", "internet", "connect", "wireless", "signal", "light", "power", "reset", "network"];
+        let matchedKeywords = [];
+        const lowerText = text.toLowerCase();
+
+        targetKeywords.forEach(kw => {
+            if(lowerText.includes(kw)) {
+                matchedKeywords.push(kw);
+            }
+        });
+
+        // Scoring Logic
+        let score = 0;
+        
+        // Word count score (max 40)
+        if (wordCount >= 40) score += 40;
+        else score += Math.round((wordCount / 40) * 40);
+
+        // Keyword usage score (max 40)
+        let kwScore = Math.min(40, matchedKeywords.length * 8);
+        score += kwScore;
+
+        // Structure & Grammar estimation (max 20)
+        if (lowerText.includes("is") || lowerText.includes("has") || lowerText.includes("have") || lowerText.includes("this")) {
+            score += 20;
+        } else {
+            score += 10;
+        }
+
+        // Display Results
+        document.getElementById('writingFeedback').style.display = 'block';
+        document.getElementById('writingScore').innerText = score;
+
+        // Construct Detailed Feedback
+        let strengths = [];
+        let weaknesses = [];
+        let suggestions = [];
+
+        if (wordCount >= 40) {
+            strengths.push(`Panjang teks sudah memadai (${wordCount} kata).`);
+        } else {
+            weaknesses.push(`Teks masih terlalu pendek (${wordCount} kata). Target minimal adalah 40-50 kata.`);
+            suggestions.push("Tambahkan deskripsi lebih detail mengenai fungsi antena dan port LAN.");
+        }
+
+        if (matchedKeywords.length >= 4) {
+            strengths.push(`Penggunaan kosa kata variatif dan relevan. Kata kunci yang terdeteksi: ${matchedKeywords.join(", ")}.`);
+        } else {
+            weaknesses.push(`Penggunaan kosa kata jaringan masih terbatas (${matchedKeywords.length} kata kunci terdeteksi).`);
+            suggestions.push("Gunakan lebih banyak kata bantu dari Vocabulary Helpers seperti 'antenna', 'wireless', 'LAN port', dan 'power'.");
+        }
+
+        if (lowerText.includes("this is") || lowerText.includes("it has") || lowerText.includes("the router")) {
+            strengths.push("Struktur kalimat teks deskriptif (Identification & Description) sudah terlihat baik.");
+        } else {
+            suggestions.push("Gunakan struktur teks deskriptif yang jelas, dimulai dengan identifikasi (misal: 'This is a Wi-Fi router...') diikuti oleh deskripsi bagian-bagiannya.");
+        }
+
+        document.getElementById('feedbackStrengths').innerText = strengths.join(" ") || "Teks berhasil ditulis.";
+        document.getElementById('feedbackWeaknesses').innerText = weaknesses.join(" ") || "Tidak ditemukan area kelemahan utama.";
+        document.getElementById('feedbackSuggestions').innerText = suggestions.join(" ") || "Pertahankan gaya penulisan Anda!";
+
+        // Play feedback voice
+        if (score >= 75) {
+            playTTS("you are right. Excellent writing performance.");
+        } else {
+            playTTS("you are wrong, try again. Please expand your text and use more vocabulary words.");
+        }
+
+        document.getElementById('writingFeedback').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
